@@ -7,9 +7,9 @@
 <section class="play-area"><div class="topline"><h2 id="level-title"></h2><div class="stats"><div class="stat">步數<b id="moves">0</b></div><div class="stat">水晶歸位<b id="goals">0 / 1</b></div></div></div><div class="board-wrap"><canvas id="board" width="720" height="720" role="img" aria-label="月光水晶推箱子棋盤：使用方向鍵或下方按鈕操作"></canvas><div class="win" id="win" hidden><div><div class="flower">🌙</div><div class="eyebrow">MISSION COMPLETE</div><h3 id="win-title">月光任務完成！</h3><p id="win-copy"></p><button id="next">下一個星際任務 →</button><br><button class="secondary" id="replay">再次挑戰</button></div></div></div><div class="legend"><span><i></i>魔法水晶</span><span><i class="goal"></i>星光座標</span><span>☾ 月之公主</span></div><div class="message" id="message" role="status" aria-live="polite"></div><div class="toolbar"><button id="undo">↶ 復原一步</button><button id="restart">↻ 重新開始</button><button id="hint">✧ 任務提示</button></div><div class="dpad" aria-label="移動方向"><button data-dir="U" aria-label="向上">↑</button><button data-dir="L" aria-label="向左">←</button><button data-dir="D" aria-label="向下">↓</button><button data-dir="R" aria-label="向右">→</button></div><div class="footer">星光會指引你，慢慢推進任務。<span id="best"></span></div></section></main>
 <script id="model">
 const LEVELS=[
-{name:'第一箱的旅行',sub:'01 · 暖身練習',hint:'走到木箱左邊，向右推到金色圓圈。',map:['#######','#     #','#     #','# @$ .#','#     #','#     #','#######']},
-{name:'兩箱的默契',sub:'02 · 換個方向',hint:'兩個目的地都在上方。試著從木箱下方往上推。',map:['#######','# . . #','#     #','# $ $ #','#  @  #','#     #','#######']},
-{name:'花園小迷宮',sub:'03 · 想好再推',hint:'先把右邊的箱子往上送，再繞到左箱下方。小心別把箱子推進角落。',map:['########','#  . . #','#  #   #','# $  $ #','#   #  #','#  @   #','#      #','########']}
+{name:'第一顆水晶的旅程',sub:'01 · 月光入門',hint:'走到水晶左邊，向右推回星光座標。',map:['#######','#     #','#     #','# @$ .#','#     #','#     #','#######']},
+{name:'雙星共鳴',sub:'02 · 月光指引',hint:'兩個星光座標都在上方，試著從水晶下方往上推。',map:['#######','# . . #','#     #','# $ $ #','#  @  #','#     #','#######']},
+{name:'月宮星圖',sub:'03 · 星際迷宮',hint:'先把右邊的水晶往上送，再繞到左側水晶下方。小心別把水晶推進角落。',map:['########','#  . . #','#  #   #','# $  $ #','#   #  #','#  @   #','#      #','########']}
 ];
 const DIR={U:[0,-1],D:[0,1],L:[-1,0],R:[1,0]};
 function createState(level){const walls=[],goals=[],boxes=[];let player;level.map.forEach((row,y)=>[...row].forEach((c,x)=>{const p=y*row.length+x;if(c==='#')walls.push(p);if('.+*'.includes(c))goals.push(p);if('$*'.includes(c))boxes.push(p);if('@+'.includes(c))player=p}));return {width:level.map[0].length,height:level.map.length,walls,goals,boxes,player,moves:0};}
@@ -42,10 +42,10 @@ function generateLevel(seed){
   }
   if(pulls<12||boxes.some(p=>goals.includes(p)))continue;
   const map=Array.from({length:8},(_,y)=>Array.from({length:8},(_,x)=>{const p=y*8+x;return walls.has(p)?'#':p===player?(goals.includes(p)?'+':'@'):boxes.includes(p)?(goals.includes(p)?'*':'$'):goals.includes(p)?'.':' '}).join(''));
-  return {name:'隨機小花園',sub:'隨機 · 三箱挑戰',hint:`關卡編號 ${seed} · 三個木箱都有路可到達目的地，先觀察再推。`,seed,map,solution:trace.reverse()};
+  return {name:'隨機星際任務',sub:'隨機 · 三水晶挑戰',hint:`任務編號 ${seed} · 三顆魔法水晶皆有路可回到星光座標，先觀察再推。`,seed,map,solution:trace.reverse()};
  }
  // Bounded fallback: three boxes each one push below their goals, always solvable.
- return {name:'隨機小花園',sub:'隨機 · 三箱挑戰',seed,hint:`關卡編號 ${seed} · 從箱子下方往上推。`,map:['########','# . . .#','# $ $ $#','# @    #','#      #','#      #','#      #','########'],solution:['U','D','R','R','U','D','R','R','U']};
+ return {name:'隨機星際任務',sub:'隨機 · 三水晶挑戰',seed,hint:`任務編號 ${seed} · 從水晶下方往上推，送回星光座標。`,map:['########','# . . .#','# $ $ $#','# @    #','#      #','#      #','#      #','########'],solution:['U','D','R','R','U','D','R','R','U']};
 }
 </script>
 <script>function rounded(x,y,w,h,r,fill){ctx.fillStyle=fill;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}
@@ -83,7 +83,7 @@ function randomLevel(){
   crypto.getRandomValues(a);const level=generateLevel(a[0]),fingerprint=level.map.join('\n');
   if(seenMaps.has(fingerprint))continue;
   seenMaps.add(fingerprint);challengeNumber++;
-  level.name=`第 ${challengeNumber} 關 · 小花園`;level.sub='挑戰 · 每關不同';
+  level.name=`第 ${challengeNumber} 關 · 星際任務`;level.sub='月光挑戰 · 每關不同';
   LEVELS[3]=level;load(3);return;
  }
  $('message').textContent='暫時未產生新的布局，請再按一次換關。';
@@ -91,7 +91,7 @@ function randomLevel(){
 function nav(){document.querySelector('.levels').innerHTML=[3,0,1,2].filter(i=>LEVELS[i]).map(i=>{const l=LEVELS[i];return `<button class="level ${current===i?'active':''}" data-level="${i}" aria-current="${current===i?'step':'false'}"><span class="num">${i===3?'∞':i+1}</span><span><strong>${i===3?'隨機闖關':'練習 '+(i+1)}</strong><small>${i===3?'第 '+challengeNumber+' 關':l.name}</small></span><span class="badge">${records[recordKey(i)]?'✓':'↗'}</span></button>`}).join('');document.querySelectorAll('[data-level]').forEach(b=>b.onclick=()=>load(+b.dataset.level));}
 function render(){draw();$('moves').textContent=state.moves;$('goals').textContent=state.boxes.filter(p=>state.goals.includes(p)).length+' / '+state.goals.length;$('undo').disabled=!history.length;$('level-title').textContent=LEVELS[current].name;$('best').textContent=records[recordKey()]?' 最佳：'+records[recordKey()]+' 步':'';$('win').hidden=!won(state);nav();}
 function load(i){current=i;state=createState(LEVELS[i]);history=[];$('message').textContent=LEVELS[i].hint;render();}
-function move(d){const next=advance(state,d);if(!next){if(!won(state))$('message').textContent='這邊推不動，試試另一個方向。';return;}history.push(state);state=next;$('message').textContent='把每個木箱，送回它的位置。';const trapped=state.boxes.some(p=>!state.goals.includes(p)&&(state.walls.includes(p-1)||state.walls.includes(p+1))&&(state.walls.includes(p-state.width)||state.walls.includes(p+state.width)));if(trapped)$('message').textContent='木箱卡進角落了！按「復原一步」就能救回來。';if(won(state)){records[recordKey()]=Math.min(records[recordKey()]||Infinity,state.moves);try{localStorage.setItem('box-garden-v1',JSON.stringify(records))}catch{}$('win-title').textContent=current===2?'花園整理完成！':'每一箱，都剛剛好。';$('win-copy').textContent=`用了 ${state.moves} 步，完成 ${state.goals.length} 個木箱歸位。`;$('next').textContent='下一關 · 全新地圖 →';$('message').textContent='過關！也可以復原一步，繼續研究更短的路線。';}render();}
+function move(d){const next=advance(state,d);if(!next){if(!won(state))$('message').textContent='這個方向暫時走不通，試試另一條星路。';return;}history.push(state);state=next;$('message').textContent='把魔法水晶送回星光座標。';const trapped=state.boxes.some(p=>!state.goals.includes(p)&&(state.walls.includes(p-1)||state.walls.includes(p+1))&&(state.walls.includes(p-state.width)||state.walls.includes(p+state.width)));if(trapped)$('message').textContent='水晶被困在角落了！復原一步，再次變身出發。';if(won(state)){records[recordKey()]=Math.min(records[recordKey()]||Infinity,state.moves);try{localStorage.setItem('box-garden-v1',JSON.stringify(records))}catch{}$('win-title').textContent='月光任務完成！';$('win-copy').textContent=`用了 ${state.moves} 步，${state.goals.length} 顆魔法水晶全部歸位。`;$('next').textContent='下一個星際任務 →';$('message').textContent='任務完成！月光力量仍在，繼續挑戰更短路線。';}render();}
 function undo(){if(history.length){state=history.pop();$('message').textContent='回到上一步，換個想法再試。';render();}}
 $('undo').onclick=undo;$('restart').onclick=()=>load(current);$('replay').onclick=()=>load(current);$('random').onclick=randomLevel;$('next').onclick=randomLevel;$('hint').onclick=()=>{$('message').textContent=LEVELS[current].hint};document.querySelectorAll('[data-dir]').forEach(b=>b.onclick=()=>move(b.dataset.dir));
 addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;const d={ArrowUp:'U',ArrowDown:'D',ArrowLeft:'L',ArrowRight:'R',w:'U',s:'D',a:'L',d:'R'}[e.key]||{w:'U',s:'D',a:'L',d:'R'}[e.key.toLowerCase()];if(d){e.preventDefault();move(d)}else if(e.key.toLowerCase()==='z'){e.preventDefault();undo()}else if(e.key.toLowerCase()==='r'){e.preventDefault();load(current)}});
